@@ -1,115 +1,95 @@
-# Reasonix Launcher
+# BEing Reasonix
 
-A **zero-dependency** desktop app for [DeepSeek-Reasonix](https://github.com/esengine/DeepSeek-Reasonix) — the DeepSeek-native AI coding agent.
+基于 DeepSeek 的 AI 编程助手桌面软件。封装 Reasonix 内核为 Windows 桌面应用，用户无需命令行即可使用完整 AI 编程能力。
 
-No Node.js required. No npm install. Just download, double-click, enter your API key.
+## 下载 & 安装
 
-**Codex-inspired UI** with one-click switching between **Code** (full filesystem + shell tools) and **Chat** (thinking partner, no disk access). Built with Electron + React + xterm.js.
+### 下载
 
-## Features
+从 [Releases](../../releases) 页面下载最新安装包 `BEing-Reasonix-Setup-x.x.x-win-x64.exe`。
 
-- 📦 **Zero dependencies** — portable Node.js 22 and Reasonix CLI bundled inside the app
-- 🖥️ **Native desktop** — Windows (.exe) and macOS (.dmg) installers
-- 🔑 **First-run wizard** — enter your DeepSeek API key once, never again
-- 🔀 **Mode switching** — toggle Code ↔ Chat in the sidebar, session restarts automatically
-- 🎨 **Codex-inspired dark theme** — GitHub-dark palette, Geist Mono font
-- 📂 **Directory picker** — choose working directory from sidebar
-- ⚡ **Full terminal** — xterm.js PTY with 256-color, resize handling
+### 安装
 
-## Download & Install
+1. 双击安装包，按提示完成安装
+2. 安装程序会自动检测 Node.js >= 24，如未安装则自动安装内置版本
+3. 安装完成后桌面自动生成快捷方式
 
-### Windows
+### 首次启动
 
-Download `Reasonix-Setup-{version}-win-x64.exe` from [Releases](../../releases).
+1. 双击桌面 `BEing Reasonix` 图标
+2. 输入 DeepSeek API Key（从 [platform.deepseek.com](https://platform.deepseek.com/api_keys) 获取）
+3. 选择工作目录（Reasonix 将在此目录下执行操作）
+4. 选择模式：**Code**（完整文件系统 + 命令行）或 **Chat**（纯对话）
+5. 开始使用
 
-1. Double-click the installer
-2. SmartScreen may warn "Unknown publisher" → **More info** → **Run anyway**
-3. Desktop shortcut created automatically
-4. Launch → enter API key → **done**
-
-### macOS
-
-Download `Reasonix-{version}-mac-{arch}.dmg` from [Releases](../../releases).
-
-1. Open `.dmg` → drag `Reasonix.app` to `/Applications`
-2. First launch: right-click → **Open** → confirm (Gatekeeper workaround)
-3. Enter API key → **done**
-
-> No Terminal. No `npm install`. No Node.js. Everything is inside the app.
-
-## First Launch
-
-The first time you open Reasonix, you'll see the API key wizard:
-
-1. Get a key at [platform.deepseek.com/api_keys](https://platform.deepseek.com/api_keys)
-2. Paste it into the input field (starts with `sk-`)
-3. Click **Continue**
-
-Your key is saved to `~/.reasonix/config.json` — the same file the CLI Reasonix uses.
-
-## User Experience
+## 核心架构
 
 ```
-Download installer
-       ↓
-   Double-click
-       ↓
-  Enter API Key    ← one time only
-       ↓
-   Choose mode:
-   ┌──────┬──────┐
-   │ Code │ Chat │
-   └──────┴──────┘
-       ↓
-    Start coding
+┌──────────────────────────────────────────┐
+│              Electron 主进程              │
+│  ┌──────────┐  ┌──────────────────────┐  │
+│  │ 配置管理  │  │  Reasonix 进程管理    │  │
+│  │ setup.ts │  │  reasonix-process.ts │  │
+│  └──────────┘  └────────┬─────────────┘  │
+│                         │ node-pty (PTY) │
+│  ┌──────────────────────┼──────────────┐  │
+│  │ DeepSeek API         │ Reasonix CLI │  │
+│  │ deepseek-api.ts      ▼              │  │
+│  └──────────────────────┴──────────────┘  │
+│                 ↕ IPC                     │
+├──────────────────────────────────────────┤
+│              Electron 渲染进程            │
+│  ┌──────────┐  ┌──────────────────────┐  │
+│  │  Sidebar │  │   TerminalPanel      │  │
+│  │  · 模型  │  │   (xterm.js)         │  │
+│  │  · API   │  │   PTY 输出直连       │  │
+│  │  · 目录  │  └──────────────────────┘  │
+│  └──────────┘                            │
+└──────────────────────────────────────────┘
 ```
 
-## How It Works (Self-Contained)
+**技术栈：** Electron + React + TypeScript + xterm.js + node-pty
 
-The app ships with everything it needs:
+**核心设计：** Reasonix 通过 node-pty 以 PTY 子进程运行，xterm.js 终端直接嵌入 UI。用户输入直接转发给 Reasonix，Reasonix 输出直接显示在终端。零解析、零过滤，体验等同于原生终端。
 
-```
-Reasonix.app/
-└── Resources/
-    ├── vendor/node/          ← portable Node.js 22 binary
-    │   ├── win32-x64/node.exe
-    │   ├── darwin-x64/node
-    │   └── darwin-arm64/node
-    └── node_modules/reasonix/ ← full Reasonix CLI
-        └── dist/cli/index.js
-```
+## 功能
 
-On launch, the app spawns the bundled Node binary directly to run Reasonix — no system Node or npm needed.
+### 左侧功能栏
 
-## Development
+| 功能 | 说明 |
+|------|------|
+| 模型切换 | auto / flash / pro 三档，点击自动执行 `/preset` |
+| API Key | 点击展开输入框，更换 DeepSeek API Key |
+| 项目目录 | 显示/更换工作目录 |
+
+### 模式选择（启动时）
+
+| 模式 | 说明 |
+|------|------|
+| Code | Reasonix code 模式，完整文件系统和命令行工具 |
+| Chat | Reasonix chat 模式，纯对话，无文件访问 |
+
+### 其他特性
+
+- **自动环境检测** — 首次启动检测 Node.js >= 24，缺失则自动静默安装
+- **API Key 记忆** — 保存到 `~/.reasonix/config.json`，后续启动自动跳过
+- **白底终端** — 简洁白色界面，专注编码
+
+## 开发
 
 ```bash
-# Install dev dependencies
-npm install
+# 安装依赖
+npm install --ignore-scripts
 
-# Download portable Node for bundling
+# 下载 Node.js 运行时
 npm run bundle:deps
 
-# Run in dev mode (Vite + Electron hot-reload)
+# 开发模式
 npm run dev
 
-# Package for distribution
-npm run pack:win    # Windows .exe
-npm run pack:mac    # macOS .dmg
-npm run pack:all    # Both
+# 构建安装包
+npm run pack:win
 ```
-
-## Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| Shell | Electron 33 |
-| UI | React 19 + Vite 5 |
-| Terminal | xterm.js 5 + node-pty |
-| Icons | Lucide React |
-| Build | electron-builder 25 |
-| Bundled Runtime | Node.js 22.12.0 portable |
-| Theme | Codex-inspired dark (GitHub palette) |
 
 ## License
 
