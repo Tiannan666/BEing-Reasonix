@@ -1,0 +1,44 @@
+{
+  "name": "being-reasonix",
+  "version": "1.0.0",
+  "description": "BEing Reasonix — DeepSeek-native AI coding agent desktop launcher",
+  "author": "BEing Reasonix",
+  "license": "MIT",
+  "main": "dist/main/index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:main\" \"npm run dev:renderer\"",
+    "dev:main": "tsc -p tsconfig.main.json && electron dist/main/index.js",
+    "dev:renderer": "vite",
+    "build": "npm run build:main && npm run build:renderer",
+    "build:main": "tsc -p tsconfig.main.json && tsc -p tsconfig.preload.json",
+    "build:renderer": "vite build && node scripts/fix-html.js",
+    "start": "electron dist/main/index.js",
+    "rebuild": "electron-rebuild -f -w node-pty",
+    "bundle:deps": "node scripts/bundle-deps.js",
+    "bundle:deps:all": "node scripts/bundle-deps.js --all",
+    "pack:win": "npm run bundle:deps && npm run build && npm run rebuild && electron-builder --win",
+    "pack:mac": "npm run bundle:deps && npm run build && npm run rebuild && electron-builder --mac",
+    "pack:all": "npm run bundle:deps:all && npm run build && npm run rebuild && electron-builder --win --mac"
+  },
+  "dependencies": {
+    "node-pty": "^1.0.0",
+    "reasonix": "^0.48.0",
+    "xterm": "^5.3.0",
+    "xterm-addon-fit": "^0.8.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "lucide-react": "^0.469.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@types/node": "^22.9.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^9.1.0",
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8",
+    "@electron/rebuild": "^3.6.0",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.10"
+  }
+}
