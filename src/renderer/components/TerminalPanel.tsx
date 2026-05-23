@@ -21,15 +21,23 @@ export default function TerminalPanel() {
     const term = new Terminal({
       cursorBlink: true,
       cursorStyle: "bar",
-      fontSize: 14,
+      fontSize: 13,
       fontFamily: "'Cascadia Code', 'JetBrains Mono', 'Fira Code', 'Consolas', monospace",
       allowProposedApi: true,
+      scrollback: 5000,
+      smoothScrollDuration: 0,
     });
 
     const fit = new FitAddon();
     term.loadAddon(fit);
     term.open(containerRef.current);
+
+    // Fit immediately and on any resize
     fit.fit();
+    const resizeObserver = new ResizeObserver(() => {
+      try { fit.fit(); } catch { /* ignore */ }
+    });
+    resizeObserver.observe(containerRef.current);
 
     termRef.current = term;
     fitRef.current = fit;
@@ -59,17 +67,18 @@ export default function TerminalPanel() {
       term.write(data);
     });
 
-    // Resize handler
+    // Handle window resize too
     const onResize = () => {
       try { fit.fit(); } catch { /* ignore */ }
     };
     window.addEventListener("resize", onResize);
 
-    // Focus terminal on mount
+    // Focus terminal
     setTimeout(() => term.focus(), 200);
 
     return () => {
       unsub();
+      resizeObserver.disconnect();
       window.removeEventListener("resize", onResize);
       term.dispose();
       termRef.current = null;
