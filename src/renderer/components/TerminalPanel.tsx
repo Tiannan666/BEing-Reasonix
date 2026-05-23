@@ -39,6 +39,21 @@ export default function TerminalPanel() {
       api.sendInput(data);
     });
 
+    // Enable Ctrl+V / Ctrl+Shift+V paste
+    term.attachCustomKeyEventHandler((e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "v") {
+        navigator.clipboard.readText().then((text) => {
+          if (text) api.sendInput(text);
+        }).catch(() => {});
+        return false; // prevent default
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === "c" && term.hasSelection()) {
+        navigator.clipboard.writeText(term.getSelection()).catch(() => {});
+        return false;
+      }
+      return true;
+    });
+
     // PTY output → terminal display
     const unsub = api.onOutput((data: string) => {
       term.write(data);
