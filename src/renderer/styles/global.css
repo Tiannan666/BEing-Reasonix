@@ -117,4 +117,4 @@ html, body, #root {
 .sidebar-apikey-confirm:hover { background: #000; color: #fff; border-color: #000; }
 
 /* ── Terminal ────────────────────────────── */
-.terminal-panel { flex: 1; overflow: hidden; }
+.terminal-panel { flex: 1; overflow: hidden; background: #000; }

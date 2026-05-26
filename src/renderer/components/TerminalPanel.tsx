@@ -1,6 +1,6 @@
 /**
- * TerminalPanel.tsx — Pure xterm.js terminal, directly connected to Reasonix PTY.
- * No filtering, no processing, no status bars. Just the terminal.
+ * TerminalPanel.tsx — xterm.js terminal directly connected to Reasonix PTY.
+ * No customization, no additions. Pure terminal.
  */
 import React, { useEffect, useRef } from "react";
 import { Terminal } from "xterm";
@@ -9,55 +9,39 @@ import { FitAddon } from "xterm-addon-fit";
 const api = window.electronAPI;
 
 export default function TerminalPanel() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const termRef = useRef<Terminal | null>(null);
+  const elRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!containerRef.current || termRef.current) return;
+    if (!elRef.current) return;
 
-    const term = new Terminal({
-      cursorBlink: true,
-      fontSize: 13,
-      fontFamily: "'Cascadia Code', 'JetBrains Mono', 'Consolas', monospace",
-      scrollback: 5000,
-    });
-
+    const term = new Terminal({ cursorBlink: true });
     const fit = new FitAddon();
     term.loadAddon(fit);
-    term.open(containerRef.current);
+    term.open(elRef.current);
     fit.fit();
 
-    // PTY output → terminal
-    api.onOutput((data: string) => term.write(data));
+    const unsub1 = api.onOutput((d: string) => term.write(d));
+    const unsub2 = api.onExited(() => term.write("\r\n--- session ended ---\r\n"));
+    term.onData((d) => api.sendInput(d));
 
-    // Keystrokes → PTY
-    term.onData((data) => api.sendInput(data));
-
-    // Ctrl+V paste
+    // minimal paste
     term.attachCustomKeyEventHandler((e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "v") {
         navigator.clipboard.readText().then((t) => { if (t) api.sendInput(t); }).catch(() => {});
         return false;
       }
-      if ((e.ctrlKey || e.metaKey) && e.key === "c" && term.hasSelection()) {
-        navigator.clipboard.writeText(term.getSelection()).catch(() => {});
-        return false;
-      }
       return true;
     });
 
-    // Resize
-    const onResize = () => { try { fit.fit(); } catch { /* */ } };
-    window.addEventListener("resize", onResize);
-
-    termRef.current = term;
+    const resize = () => { try { fit.fit(); } catch {} };
+    window.addEventListener("resize", resize);
 
     return () => {
-      window.removeEventListener("resize", onResize);
+      unsub1(); unsub2();
+      window.removeEventListener("resize", resize);
       term.dispose();
-      termRef.current = null;
     };
   }, []);
 
-  return <div ref={containerRef} className="terminal-panel" />;
+  return <div ref={elRef} className="terminal-panel" />;
 }
