@@ -11,10 +11,9 @@ extraResources:
     to: vendor/node/
   - from: vendor/node-installer/
     to: vendor/node-installer/
-  - from: node_modules/reasonix/
-    to: node_modules/reasonix/
 
 asar: true
+
 
 win:
   target:
@@ -23,11 +22,13 @@ win:
         - x64
   icon: assets/being-mind.png
   artifactName: "BEing-Reasonix-Setup-${version}-win-x64.${ext}"
+  verifyUpdateCodeSignature: false
 
 nsis:
   oneClick: false
   perMachine: false
   allowToChangeInstallationDirectory: true
+  runAfterFinish: false
   createDesktopShortcut: true
   createStartMenuShortcut: true
   shortcutName: BEing Reasonix
