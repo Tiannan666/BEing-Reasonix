@@ -1,120 +1,20 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html, body, #root {
-  height: 100%; width: 100%; overflow: hidden;
-  background: #ffffff;
-  font-family: 'Inter', -apple-system, sans-serif;
-  font-size: 14px;
-}
+html, body, #root { height: 100%; width: 100%; overflow: hidden; background: #fff; font-family: 'Inter', sans-serif; font-size: 14px; }
 
-/* ── Loading ─────────────────────────────── */
-.loading-screen {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  height: 100%; gap: 16px; color: #333;
-}
-.loading-spinner {
-  width: 32px; height: 32px;
-  border: 3px solid #ccc; border-top-color: #000;
-  border-radius: 50%; animation: spin 0.8s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* ── Wizard shared ─────────────────────────  */
-.wizard-overlay {
-  display: flex; align-items: center; justify-content: center;
-  height: 100%; background: #fff;
-}
-.wizard-card {
-  width: 420px; padding: 40px; background: #fff;
-  border: 1px solid #ccc; border-radius: 12px;
-  text-align: center; display: flex; flex-direction: column; gap: 20px;
-}
-.wizard-title { font-size: 22px; font-weight: 600; color: #000; }
+.wizard-overlay { display: flex; align-items: center; justify-content: center; height: 100%; background: #fff; }
+.wizard-card { width: 420px; padding: 40px; background: #fff; border: 1px solid #ccc; border-radius: 12px; text-align: center; display: flex; flex-direction: column; gap: 20px; }
+.wizard-title { font-size: 22px; font-weight: 600; }
 .wizard-subtitle { font-size: 13px; color: #333; line-height: 1.6; }
-.wizard-input {
-  width: 100%; padding: 10px 14px; background: #fff;
-  border: 1px solid #ccc; border-radius: 8px;
-  color: #000; font-size: 13px; outline: none;
-}
-.wizard-input:focus { border-color: #000; box-shadow: 0 0 0 3px rgba(0,0,0,0.08); }
-.wizard-label {
-  display: block; font-size: 12px; font-weight: 500; color: #333;
-  margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;
-}
+.wizard-input { width: 100%; padding: 10px 14px; background: #fff; border: 1px solid #ccc; border-radius: 8px; color: #000; font-size: 13px; outline: none; }
+.wizard-input:focus { border-color: #000; }
 .wizard-input-group { text-align: left; }
-.wizard-input--error { border-color: #cf222e; }
-.wizard-input--success { border-color: #1a7f37; }
-.wizard-message { display: flex; align-items: center; gap: 6px; margin-top: 8px; font-size: 12px; }
-.wizard-message--error { color: #cf222e; }
-.wizard-message--success { color: #1a7f37; }
-.wizard-button {
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  padding: 10px 24px; background: #000; color: #fff;
-  border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer;
-}
-.wizard-button:hover { background: #333; }
-.wizard-button:disabled { opacity: 0.5; cursor: default; }
-.wizard-button-secondary {
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  padding: 10px 24px; background: #fff; color: #000;
-  border: 1px solid #ccc; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer;
-}
-.wizard-button-secondary:hover { background: #f5f5f5; }
 
-/* ── App layout ──────────────────────────── */
-.app-layout { display: flex; height: 100%; width: 100%; }
-.main-panel { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.wizard-btn { padding: 10px 24px; background: #000; color: #fff; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; }
+.wizard-btn:hover { background: #333; }
+.wizard-btn:disabled { opacity: 0.4; cursor: default; }
+.wizard-btn-secondary { padding: 10px 24px; background: #fff; color: #000; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; cursor: pointer; }
+.wizard-btn-secondary:hover { background: #f5f5f5; }
 
-/* ── Sidebar ─────────────────────────────── */
-.sidebar {
-  width: 220px; min-width: 220px; height: 100%;
-  background: #fff; border-right: 1px solid #ccc;
-  display: flex; flex-direction: column; padding: 12px;
-}
-.sidebar-brand {
-  display: flex; align-items: center; gap: 10px; padding: 8px 10px 16px;
-}
-.sidebar-title { font-size: 16px; font-weight: 600; }
-.sidebar-section { padding: 12px 0 8px; }
-.sidebar-section-label {
-  font-size: 10px; font-weight: 600; text-transform: uppercase;
-  letter-spacing: 0.8px; color: #666; padding: 0 12px 6px;
-}
-.sidebar-project-card {
-  display: flex; align-items: center; gap: 10px; width: 100%;
-  padding: 10px 12px; border: 1px solid #ccc; border-radius: 8px;
-  background: #fff; cursor: pointer; text-align: left;
-}
-.sidebar-project-card:hover { border-color: #000; }
-.sidebar-project-name { font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.sidebar-project-path { font-size: 10px; color: #999; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.sidebar-model-switcher { display: flex; gap: 4px; padding: 0 2px; }
-.sidebar-model-btn {
-  flex: 1; padding: 6px 4px; background: #fff; border: 1px solid #ccc;
-  border-radius: 4px; color: #000; font-size: 11px; cursor: pointer; text-align: center;
-}
-.sidebar-model-btn:hover { background: #000; color: #fff; border-color: #000; }
-.sidebar-spacer { flex: 1; }
-
-/* API Key */
-.sidebar-apikey-toggle {
-  display: flex; align-items: center; gap: 8px; width: 100%;
-  padding: 8px 12px; background: #fff; border: 1px solid #ccc;
-  border-radius: 8px; color: #000; font-size: 12px; cursor: pointer;
-}
-.sidebar-apikey-toggle:hover { border-color: #000; }
-.sidebar-apikey-input {
-  width: 100%; padding: 6px 8px; background: #fff; border: 1px solid #ccc;
-  border-radius: 4px; color: #000; font-size: 11px; outline: none;
-}
-.sidebar-apikey-input:focus { border-color: #000; }
-.sidebar-apikey-actions { display: flex; gap: 4px; justify-content: flex-end; }
-.sidebar-apikey-confirm, .sidebar-apikey-cancel {
-  display: flex; align-items: center; justify-content: center;
-  width: 28px; height: 28px; border: 1px solid #ccc; border-radius: 4px;
-  background: #fff; color: #000; cursor: pointer;
-}
-.sidebar-apikey-confirm:hover { background: #000; color: #fff; border-color: #000; }
-
-/* ── Terminal ────────────────────────────── */
-.terminal-panel { flex: 1; overflow: hidden; background: #000; }
+.loading-spinner { width: 32px; height: 32px; border: 3px solid #ccc; border-top-color: #000; border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }

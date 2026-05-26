@@ -25,6 +25,7 @@ import {
   stopSession,
   sendInput,
   getSessionInfo,
+  launchNativeTerminal,
   ReasonixMode,
 } from "./reasonix-process";
 import { streamChat, fetchBalance, ChatMessage } from "./deepseek-api";
@@ -162,6 +163,11 @@ export function registerIpcHandlers(): void {
     "history:delete",
     (_event, skill: string, id: string) => deleteConversation(skill, id)
   );
+
+  // ── Launch native terminal ──────────────────────────────────
+  ipcMain.handle("terminal:launch", (_event, mode: string, cwd: string, model: string) => {
+    return launchNativeTerminal(mode, cwd, model);
+  });
 
   // ── Code Mode ────────────────────────────────────────────────
   ipcMain.handle(

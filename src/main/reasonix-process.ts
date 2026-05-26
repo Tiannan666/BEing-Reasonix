@@ -109,6 +109,34 @@ export function ensureReasonixInstalled(): boolean {
   }
 }
 
+/**
+ * Launch a native PowerShell window running Reasonix.
+ * Returns true if the process was spawned successfully.
+ */
+export function launchNativeTerminal(mode: string, cwd: string, model: string): boolean {
+  const nodePath = getNodePath();
+  const cliPath = getReasonixCliPath();
+  if (!fs.existsSync(cliPath)) return false;
+
+  const args = mode === "code"
+    ? [cliPath, "code", cwd || os.homedir()]
+    : [cliPath, "chat"];
+
+  // Build a PowerShell command that changes to the directory and runs Reasonix
+  const psCmd = `cd "${cwd || os.homedir()}" ; & "${nodePath}" ${args.map(a => `"${a}"`).join(" ")} ; Read-Host "Press Enter to exit"`;
+
+  try {
+    const { spawn } = require("child_process");
+    spawn("powershell.exe", ["-NoExit", "-Command", psCmd], {
+      detached: true,
+      stdio: "ignore",
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 /** Check system Node.js >= 22. If missing, install from bundled MSI. */
 export function ensureNodeJs(): void {
   try {
